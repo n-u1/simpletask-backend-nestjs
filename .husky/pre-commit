@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# TypeScript型チェック
+echo "🔍 TypeScript型チェック中..."
+pnpm run type-check
+
+# Lint staged files
+echo "🧹 Lintとフォーマット実行中..."
+npx lint-staged
+
+# テスト実行（準備中のためコメントアウト）
+# echo "🧪 テスト実行中..."
+# pnpm run test --passWithNoTests --findRelatedTests $(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|js)$' | tr '\n' ' ')

@@ -1,0 +1,73 @@
+# Git & Docker meta files
+.git
+.gitignore
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Dependencies (will be installed fresh in container)
+node_modules
+
+# Environment files (use container env vars instead)
+.env*
+
+# Build outputs (will be built in container)
+dist
+
+# Cache directories
+.cache
+.parcel-cache
+.eslintcache
+.rpt2_cache
+.rts2_cache_*
+.nyc_output
+
+# Test coverage
+coverage
+*.lcov
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime files
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary directories
+tmp
+temp
+
+# Development tools (not needed in production container)
+.husky
+
+# Documentation (can be large)
+docs
+README.md
+*.md
+
+# Database files (should use external DB)
+*.db
+*.sqlite*
+
+# Test files (not needed in production)
+test
+**/*.test.ts
+**/*.spec.ts

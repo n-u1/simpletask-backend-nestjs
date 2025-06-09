@@ -1,0 +1,76 @@
+services:
+  simpletask-nestjs-db:
+    image: postgres:17.5-alpine
+    container_name: simpletask-nestjs-db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_network
+
+  simpletask-nestjs-redis:
+    image: redis:7.4-alpine
+    container_name: simpletask-nestjs-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD}', '--raw', 'incr', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - backend_network
+
+  simpletask-nestjs-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: simpletask-nestjs-api
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@simpletask-nestjs-db:5432/${DB_NAME}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@simpletask-nestjs-redis:6379/0
+      - NODE_ENV=development
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      simpletask-nestjs-db:
+        condition: service_healthy
+      simpletask-nestjs-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  backend_network:
+    driver: bridge
+    name: simpletask_nestjs_network

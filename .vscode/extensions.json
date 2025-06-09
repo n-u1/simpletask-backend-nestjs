@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    "redhat.vscode-yaml",
+    "ms-vscode.vscode-docker",
+    "humao.rest-client",
+    "orta.vscode-jest"
+  ]
+}
