@@ -31,6 +31,6 @@
       "@common/*": ["src/common/*"]
     }
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*", "test/**/*", "database/data-source.ts", "database/cli-data-source.ts"],
+  "exclude": ["node_modules", "dist", "database/migrations"]
 }

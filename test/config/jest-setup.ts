@@ -9,13 +9,10 @@ import { randomUUID } from 'crypto';
 import { config } from 'dotenv';
 import 'reflect-metadata';
 
-// テスト環境用の環境変数読み込み
 config({ path: '.env.test' });
 
-// グローバルテストタイムアウト設定
 jest.setTimeout(30000);
 
-// データベーステスト用のセットアップ
 beforeAll((): void => {
   // テスト用データベース接続確認
   process.env.NODE_ENV = 'test';
@@ -31,7 +28,6 @@ const originalConsoleWarn: typeof console.warn = console.warn;
 const originalConsoleError: typeof console.error = console.error;
 
 console.warn = (...args: unknown[]): void => {
-  // 特定の警告をフィルタ
   const message = args[0];
   if (typeof message === 'string') {
     // TypeORM実験的機能の警告を抑制
@@ -47,7 +43,6 @@ console.warn = (...args: unknown[]): void => {
 };
 
 console.error = (...args: unknown[]): void => {
-  // 特定のエラーをフィルタ
   const message = args[0];
   if (typeof message === 'string') {
     // 予期されるテストエラーを抑制
@@ -71,27 +66,21 @@ jest.mock('ioredis', () => {
   }));
 });
 
-// 日時モック用ヘルパー
 export const mockDate = (date: string | Date): jest.SpyInstance => {
   const targetDate = new Date(date);
   const spy = jest.spyOn(global.Date, 'now').mockReturnValue(targetDate.getTime());
   return spy;
 };
 
-// テスト用ユーティリティ
 export const testUtils = {
-  // ランダムなメールアドレス生成
   randomEmail: (): string => `test-${Math.random().toString(36).substring(2, 11)}@example.com`,
 
-  // ランダムなUUID生成
   randomUuid: (): string => {
     return randomUUID();
   },
 
-  // 待機ヘルパー
   wait: (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms)),
 
-  // テスト用パスワード
   testPassword: 'Test123!@#',
 
   // テスト用ユーザーデータ
@@ -130,7 +119,6 @@ export const testUtils = {
   }),
 };
 
-// 非同期テスト用ヘルパー
 export const expectAsync = {
   toResolve: async (promise: Promise<unknown>): Promise<void> => {
     await expect(promise).resolves.toBeDefined();
@@ -145,9 +133,7 @@ export const expectAsync = {
   },
 };
 
-// テストデータベースヘルパー
 export const dbTestUtils = {
-  // テーブル全削除
   clearAllTables: async (dataSource: {
     entityMetadatas: Array<{ name: string }>;
     getRepository: (name: string) => { clear: () => Promise<void> };
@@ -173,7 +159,6 @@ export const dbTestUtils = {
 
 // Nest.jsテスト用ヘルパー
 export const nestTestUtils = {
-  // テスト用モジュール作成ヘルパー
   createTestingModule: async (imports: any[] = [], providers: any[] = []): Promise<any> => {
     const { Test } = await import('@nestjs/testing');
 
@@ -183,7 +168,6 @@ export const nestTestUtils = {
     }).compile();
   },
 
-  // モックサービス作成
   createMockService: <T extends Record<string, unknown>>(methods: Array<keyof T>): jest.Mocked<T> => {
     const mock = {} as jest.Mocked<T>;
     methods.forEach(method => {

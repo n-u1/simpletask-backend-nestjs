@@ -101,11 +101,25 @@ export default tseslint.config(
     files: ['**/*.spec.ts', '**/*.test.ts', '**/*e2e-spec.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off', // テストでは許可
-      'no-console': 'off', // テストログ用
+      'no-console': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
     },
   },
   {
-    ignores: ['.eslintrc.js', 'eslint.config.js', 'dist/', 'node_modules/', 'coverage/', '**/*.js'],
+    files: ['database/data-source.ts', 'database/cli-data-source.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
+    ignores: [
+      '.eslintrc.js',
+      'eslint.config.js',
+      'dist/',
+      'node_modules/',
+      'coverage/',
+      '**/*.js',
+      'database/migrations/**',
+    ],
   },
 );
