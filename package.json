@@ -20,9 +20,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d database/data-source.ts",
-    "migration:run": "typeorm-ts-node-commonjs migration:run -d database/data-source.ts",
-    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d database/data-source.ts",
+    "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d database/cli-data-source.ts",
+    "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d database/cli-data-source.ts",
+    "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d database/cli-data-source.ts",
     "seed": "ts-node database/seeds/index.ts",
     "typeorm": "typeorm-ts-node-commonjs",
     "type-check": "tsc --noEmit"
@@ -109,11 +109,12 @@
     ]
   },
   "engines": {
-    "node": "22.x",
-    "pnpm": "10.x"
+    "node": "22.16.0",
+    "pnpm": "10.12.1"
   },
   "volta": {
-    "node": "22.13.1",
-    "pnpm": "10.11.1"
-  }
+    "node": "22.16.0",
+    "pnpm": "10.12.1"
+  },
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
 }

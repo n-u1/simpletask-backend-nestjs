@@ -1,3 +1,7 @@
+# バージョン設定（package.jsonから動的取得）
+REQUIRED_NODE_VERSION := $(shell node -p "require('./package.json').volta?.node || require('./package.json').engines?.node || '22.16.0'" 2>/dev/null || echo "22.16.0")
+REQUIRED_PNPM_VERSION := $(shell node -p "require('./package.json').volta?.pnpm || require('./package.json').engines?.pnpm || require('./package.json').packageManager?.replace('pnpm@', '') || '10.12.1'" 2>/dev/null || echo "10.12.1")
+
 .PHONY: help setup check-node install format lint test test-cov test-auth test-crud test-integrity test-failed test-debug clean docker-build docker-up docker-down docker-test migrate env-check security generate-secrets all-checks
 
 help: ## ヘルプを表示
@@ -11,10 +15,18 @@ setup: ## 初回環境セットアップ
 	@./scripts/setup.sh
 
 check-node: ## Node.jsバージョンチェック
-	@node --version | grep -q "v22" || (echo "❌ Node.js 22.x が必要です" && exit 1)
-	@echo "✅ Node.js バージョンOK"
-	@pnpm --version > /dev/null || (echo "❌ pnpm が必要です" && exit 1)
-	@echo "✅ pnpm バージョンOK"
+	@CURRENT_NODE=$$(node --version | sed 's/v//'); \
+	if [ "$$CURRENT_NODE" != "$(REQUIRED_NODE_VERSION)" ]; then \
+		echo "❌ Node.js $(REQUIRED_NODE_VERSION) が必要です（現在: $$CURRENT_NODE）"; \
+		exit 1; \
+	fi
+	@echo "✅ Node.js バージョンOK ($(REQUIRED_NODE_VERSION))"
+	@CURRENT_PNPM=$$(pnpm --version 2>/dev/null || echo "none"); \
+	if [ "$$CURRENT_PNPM" != "$(REQUIRED_PNPM_VERSION)" ]; then \
+		echo "❌ pnpm $(REQUIRED_PNPM_VERSION) が必要です（現在: $$CURRENT_PNPM）"; \
+		exit 1; \
+	fi
+	@echo "✅ pnpm バージョンOK ($(REQUIRED_PNPM_VERSION))"
 
 check-volta: ## Voltaバージョンチェック
 	@volta --version > /dev/null || (echo "❌ Volta が必要です" && exit 1)
@@ -231,8 +243,8 @@ outdated: ## 古くなった依存関係をチェック
 info: ## プロジェクト情報を表示
 	@echo "📋 SimpleTask Nest.js Backend"
 	@echo "🏷️  バージョン: $(shell node -p "require('./package.json').version")"
-	@echo "🟢 Node.js: $(shell node --version)"
-	@echo "📦 pnpm: $(shell pnpm --version)"
+	@echo "🟢 Node.js: $(shell node --version) (要求: $(REQUIRED_NODE_VERSION))"
+	@echo "📦 pnpm: $(shell pnpm --version) (要求: $(REQUIRED_PNPM_VERSION))"
 	@echo "🔧 Volta: $(shell volta --version 2>/dev/null || echo 'not installed')"
 	@echo "🐳 Docker: $(shell docker --version | cut -d' ' -f3 | tr -d ',')"
 	@echo "📁 プロジェクトディレクトリ: $(PWD)"

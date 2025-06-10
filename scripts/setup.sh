@@ -6,7 +6,6 @@ set -e
 
 echo "🚀 SimpleTask Nest.js Backend セットアップを開始します..."
 
-# 関数定義
 check_command() {
     if ! command -v "$1" &> /dev/null; then
         echo "❌ エラー: $1 がインストールされていません"
@@ -39,68 +38,122 @@ check_command() {
     fi
 }
 
+get_required_versions() {
+    if [ ! -f "package.json" ]; then
+        echo "❌ エラー: package.json が見つかりません"
+        echo "💡 プロジェクトルートで実行していることを確認してください"
+        exit 1
+    fi
+
+    # package.jsonから要求バージョンの情報を取得
+    REQUIRED_NODE=$(node -p "
+        try {
+            const pkg = require('./package.json');
+            pkg.volta?.node || pkg.engines?.node || '22.16.0'
+        } catch(e) {
+            '22.16.0'
+        }
+    " 2>/dev/null || echo "22.16.0")
+
+    REQUIRED_PNPM=$(node -p "
+        try {
+            const pkg = require('./package.json');
+            pkg.volta?.pnpm || pkg.engines?.pnpm || pkg.packageManager?.replace('pnpm@', '') || '10.12.1'
+        } catch(e) {
+            '10.12.1'
+        }
+    " 2>/dev/null || echo "10.12.1")
+
+    echo "📋 package.jsonから読み取った要求バージョン:"
+    echo "  Node.js: $REQUIRED_NODE"
+    echo "  pnpm: $REQUIRED_PNPM"
+}
+
 # 必要なコマンドの存在確認
 echo "🔍 必要なツールの確認..."
 check_command "volta"
-check_command "node"
-check_command "pnpm"
 check_command "docker"
 check_command "docker-compose"
 check_command "git"
 
-# Node.js バージョンチェック
-NODE_VERSION=$(node --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-REQUIRED_MAJOR_VERSION="22"
+# package.jsonから要求バージョンを取得
+get_required_versions
 
-if [[ ! "$NODE_VERSION" =~ ^22\. ]]; then
-    echo "❌ エラー: Node.js 22.x が必要です（現在: v$NODE_VERSION）"
-    echo "💡 解決方法:"
-    echo "1. volta install node@22.x"
-    echo "2. volta pin node@22.x"
-    echo ""
-    echo "📝 例: v22.0.0, v22.1.0, v22.15.0 などは全て使用可能"
-
-    # 自動修正を提案
-    read -p "🤔 Volta で Node.js 22.x を自動インストールしますか？ (y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "📦 Node.js 22.x をインストール中..."
-        volta install node@22.x
-        volta pin node@22.x
-        echo "✅ Node.js 22.x インストール完了"
-        NODE_VERSION=$(node --version | cut -d'v' -f2)
-    else
-        exit 1
-    fi
+# Node.js がインストールされているかチェック
+if ! command -v node &> /dev/null; then
+    echo "📦 Node.js $REQUIRED_NODE をインストール中..."
+    volta install node@$REQUIRED_NODE
 fi
 
-# pnpm バージョンチェック & 自動設定
+# pnpm がインストールされているかチェック
 if ! command -v pnpm &> /dev/null; then
-    echo "📦 pnpm をインストール中..."
-    volta install pnpm
+    echo "📦 pnpm $REQUIRED_PNPM をインストール中..."
+    volta install pnpm@$REQUIRED_PNPM
 fi
 
-PNPM_VERSION=$(pnpm --version)
-echo "✅ Node.js バージョン確認: v$NODE_VERSION (Volta管理)"
-echo "✅ pnpm バージョン確認: $PNPM_VERSION (Volta管理)"
+# 現在のバージョンを確認
+CURRENT_NODE=$(node --version | sed 's/v//')
+CURRENT_PNPM=$(pnpm --version)
+
+echo "📋 現在のバージョン:"
+echo "  Node.js: v$CURRENT_NODE"
+echo "  pnpm: $CURRENT_PNPM"
+
+# バージョンチェック関数
+version_check() {
+    local current=$1
+    local required=$2
+    local tool=$3
+
+    if [[ "$current" != "$required" ]]; then
+        echo "⚠️  $tool バージョンが一致しません"
+        echo "   現在: $current"
+        echo "   要求: $required"
+
+        read -p "🤔 Volta で $tool $required を自動インストールしますか？ (Y/n): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+            echo "📦 $tool $required をインストール中..."
+            volta install $tool@$required
+            volta pin $tool@$required
+            echo "✅ $tool $required インストール完了"
+
+            # バージョンを再取得
+            case $tool in
+                "node")
+                    CURRENT_NODE=$(node --version | sed 's/v//')
+                    ;;
+                "pnpm")
+                    CURRENT_PNPM=$(pnpm --version)
+                    ;;
+            esac
+        fi
+    else
+        echo "✅ $tool バージョン確認: $current (要求: $required)"
+    fi
+}
+
+# バージョンチェック実行
+version_check "$CURRENT_NODE" "$REQUIRED_NODE" "node"
+version_check "$CURRENT_PNPM" "$REQUIRED_PNPM" "pnpm"
 
 # Volta プロジェクト設定確認
-if [ ! -f "package.json" ]; then
-    echo "📝 package.json が見つからないため、Volta設定をスキップします"
-else
-    echo "🔧 Volta プロジェクト設定を確認中..."
+echo "🔧 Volta プロジェクト設定を確認中..."
+node -e "
+    const fs = require('fs');
+    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
-    # package.jsonに volta 設定を追加
-    node -e "
-        const fs = require('fs');
-        const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-        pkg.volta = pkg.volta || {};
-        pkg.volta.node = '$NODE_VERSION';
-        pkg.volta.pnpm = '$PNPM_VERSION';
-        fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-        console.log('✅ package.json に Volta 設定を追加しました');
-    "
-fi
+    // volta設定を更新
+    pkg.volta = pkg.volta || {};
+    pkg.volta.node = '$CURRENT_NODE';
+    pkg.volta.pnpm = '$CURRENT_PNPM';
+
+    // packageManager設定を更新
+    pkg.packageManager = 'pnpm@$CURRENT_PNPM';
+
+    fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+    console.log('✅ package.json の Volta/packageManager 設定を更新しました');
+"
 
 # OS 検出（sedコマンドの引数調整用）
 OS="$(uname -s)"
@@ -164,13 +217,6 @@ fi
 
 # 3. 依存関係のインストール
 echo "📦 依存関係をインストールしています..."
-
-if [ ! -f "package.json" ]; then
-    echo "❌ エラー: package.json が見つかりません"
-    echo "💡 プロジェクト構成を確認してください"
-    exit 1
-fi
-
 pnpm install
 
 # 4. Git フックの設定（Huskyを使用）
@@ -241,8 +287,8 @@ echo ""
 echo "🎉 セットアップが完了しました！"
 echo ""
 echo "📋 環境構成:"
-echo "  Node.js: v$NODE_VERSION (Volta管理)"
-echo "  pnpm: $PNPM_VERSION (Volta管理)"
+echo "  Node.js: v$CURRENT_NODE (Volta管理)"
+echo "  pnpm: $CURRENT_PNPM (Volta管理)"
 echo "  環境設定: .env (開発用設定)"
 echo ""
 echo "🚀 次のステップ:"
