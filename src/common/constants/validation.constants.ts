@@ -1,3 +1,5 @@
+import { TagConstants, TaskConstants, UserConstants } from './app.constants';
+
 /**
  * バリデーション関連の定数
  * class-validatorで使用する制約値とメッセージを管理
@@ -16,10 +18,10 @@ export class ValidationPatterns {
   static readonly PASSWORD_STRONG = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
 
   // 表示名（日本語、英数字、一部記号）
-  static readonly DISPLAY_NAME = /^[a-zA-Z0-9ぁ-んァ-ヶー一-龠\s\-_.]+$/;
+  static readonly DISPLAY_NAME = UserConstants.DISPLAY_NAME_PATTERN;
 
   // カラーコード（#RRGGBB形式）
-  static readonly COLOR_CODE = /^#[0-9A-Fa-f]{6}$/;
+  static readonly COLOR_CODE = TagConstants.COLOR_PATTERN;
 
   // UUID v4形式
   static readonly UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -36,102 +38,27 @@ export class ValidationPatterns {
 }
 
 // =============================================================================
-// バリデーションメッセージ
-// =============================================================================
-
-export class ValidationMessages {
-  // 共通メッセージ
-  static readonly REQUIRED = '必須項目です';
-  static readonly INVALID_FORMAT = '形式が正しくありません';
-  static readonly TOO_SHORT = '短すぎます';
-  static readonly TOO_LONG = '長すぎます';
-  static readonly INVALID_TYPE = '型が正しくありません';
-  static readonly OUT_OF_RANGE = '範囲外の値です';
-
-  // メール関連
-  static readonly EMAIL_REQUIRED = 'メールアドレスは必須です';
-  static readonly EMAIL_INVALID = '有効なメールアドレスを入力してください';
-  static readonly EMAIL_TOO_LONG = 'メールアドレスは255文字以内で入力してください';
-
-  // パスワード関連
-  static readonly PASSWORD_REQUIRED = 'パスワードは必須です';
-  static readonly PASSWORD_TOO_SHORT = 'パスワードは8文字以上で入力してください';
-  static readonly PASSWORD_TOO_LONG = 'パスワードは128文字以内で入力してください';
-  static readonly PASSWORD_WEAK = 'パスワードには英字と数字を含めてください';
-  static readonly PASSWORD_MISMATCH = 'パスワードが一致しません';
-
-  // 表示名関連
-  static readonly DISPLAY_NAME_REQUIRED = '表示名は必須です';
-  static readonly DISPLAY_NAME_TOO_SHORT = '表示名は2文字以上で入力してください';
-  static readonly DISPLAY_NAME_TOO_LONG = '表示名は20文字以内で入力してください';
-  static readonly DISPLAY_NAME_INVALID = '表示名に使用できない文字が含まれています';
-
-  // タスク関連
-  static readonly TASK_TITLE_REQUIRED = 'タスクタイトルは必須です';
-  static readonly TASK_TITLE_TOO_LONG = 'タスクタイトルは20文字以内で入力してください';
-  static readonly TASK_DESCRIPTION_TOO_LONG = 'タスク説明は2000文字以内で入力してください';
-  static readonly TASK_STATUS_INVALID = '無効なステータスです';
-  static readonly TASK_PRIORITY_INVALID = '無効な優先度です';
-  static readonly TASK_POSITION_INVALID = '位置は0以上99999以下で入力してください';
-  static readonly TASK_DUE_DATE_INVALID = '有効な日時を入力してください';
-
-  // タグ関連
-  static readonly TAG_NAME_REQUIRED = 'タグ名は必須です';
-  static readonly TAG_NAME_TOO_LONG = 'タグ名は20文字以内で入力してください';
-  static readonly TAG_COLOR_INVALID = '有効なカラーコード（#RRGGBB形式）を入力してください';
-  static readonly TAG_DESCRIPTION_TOO_LONG = 'タグ説明は200文字以内で入力してください';
-
-  // URL関連
-  static readonly AVATAR_URL_INVALID = '有効なURLを入力してください';
-  static readonly AVATAR_URL_TOO_LONG = 'URLは500文字以内で入力してください';
-
-  // UUID関連
-  static readonly UUID_INVALID = '有効なUUIDを入力してください';
-
-  // 日時関連
-  static readonly DATE_INVALID = '有効な日時を入力してください';
-  static readonly DATE_IN_PAST = '過去の日時は指定できません';
-  static readonly DATE_TOO_FAR = '日時が未来すぎます';
-
-  // 数値関連
-  static readonly NUMBER_INVALID = '有効な数値を入力してください';
-  static readonly NUMBER_TOO_SMALL = '値が小さすぎます';
-  static readonly NUMBER_TOO_LARGE = '値が大きすぎます';
-  static readonly INTEGER_INVALID = '整数を入力してください';
-
-  // 配列関連
-  static readonly ARRAY_EMPTY = '1つ以上選択してください';
-  static readonly ARRAY_TOO_MANY = '選択数が多すぎます';
-
-  // ファイル関連
-  static readonly FILE_REQUIRED = 'ファイルは必須です';
-  static readonly FILE_TOO_LARGE = 'ファイルサイズが大きすぎます';
-  static readonly FILE_INVALID_TYPE = 'サポートされていないファイル形式です';
-}
-
-// =============================================================================
-// バリデーション制約値
+// class-validator用制約値
 // =============================================================================
 
 export class ValidationLimits {
   // 文字列長制限
-  static readonly EMAIL_MAX_LENGTH = 255;
-  static readonly PASSWORD_MIN_LENGTH = 8;
-  static readonly PASSWORD_MAX_LENGTH = 128;
-  static readonly DISPLAY_NAME_MIN_LENGTH = 2;
-  static readonly DISPLAY_NAME_MAX_LENGTH = 20;
-  static readonly TASK_TITLE_MAX_LENGTH = 20;
-  static readonly TASK_DESCRIPTION_MAX_LENGTH = 2000;
-  static readonly TAG_NAME_MAX_LENGTH = 20;
-  static readonly TAG_DESCRIPTION_MAX_LENGTH = 200;
-  static readonly AVATAR_URL_MAX_LENGTH = 500;
+  static readonly EMAIL_MAX_LENGTH = UserConstants.EMAIL_MAX_LENGTH;
+  static readonly PASSWORD_MIN_LENGTH = UserConstants.PASSWORD_MIN_LENGTH;
+  static readonly PASSWORD_MAX_LENGTH = UserConstants.PASSWORD_MAX_LENGTH;
+  static readonly DISPLAY_NAME_MIN_LENGTH = UserConstants.DISPLAY_NAME_MIN_LENGTH;
+  static readonly DISPLAY_NAME_MAX_LENGTH = UserConstants.DISPLAY_NAME_MAX_LENGTH;
+  static readonly TASK_TITLE_MIN_LENGTH = TaskConstants.TITLE_MIN_LENGTH;
+  static readonly TASK_TITLE_MAX_LENGTH = TaskConstants.TITLE_MAX_LENGTH;
+  static readonly TASK_DESCRIPTION_MAX_LENGTH = TaskConstants.DESCRIPTION_MAX_LENGTH;
+  static readonly TAG_NAME_MIN_LENGTH = TagConstants.NAME_MIN_LENGTH;
+  static readonly TAG_NAME_MAX_LENGTH = TagConstants.NAME_MAX_LENGTH;
+  static readonly TAG_DESCRIPTION_MAX_LENGTH = TagConstants.DESCRIPTION_MAX_LENGTH;
+  static readonly AVATAR_URL_MAX_LENGTH = UserConstants.AVATAR_URL_MAX_LENGTH;
 
   // 数値制限
-  static readonly TASK_POSITION_MIN = 0;
-  static readonly TASK_POSITION_MAX = 99999;
-  static readonly PAGE_SIZE_MIN = 1;
-  static readonly PAGE_SIZE_MAX = 100;
-  static readonly PAGE_SIZE_DEFAULT = 20;
+  static readonly TASK_POSITION_MIN = TaskConstants.POSITION_MIN;
+  static readonly TASK_POSITION_MAX = TaskConstants.POSITION_MAX;
 
   // 配列制限
   static readonly TAG_IDS_MAX_COUNT = 10; // 1タスクに付けられるタグの最大数
@@ -146,6 +73,53 @@ export class ValidationLimits {
 }
 
 // =============================================================================
+// class-validator用バリデーションメッセージ
+// =============================================================================
+
+export class ValidationMessages {
+  // 共通メッセージ（class-validator用）
+  static readonly IS_NOT_EMPTY = '$property は必須項目です';
+  static readonly IS_STRING = '$property は文字列である必要があります';
+  static readonly IS_NUMBER = '$property は数値である必要があります';
+  static readonly IS_BOOLEAN = '$property は真偽値である必要があります';
+  static readonly IS_UUID = '$property は有効なUUIDである必要があります';
+  static readonly IS_EMAIL = '$property は有効なメールアドレスである必要があります';
+  static readonly IS_URL = '$property は有効なURLである必要があります';
+  static readonly IS_DATE = '$property は有効な日時である必要があります';
+
+  // 長さ制限メッセージ
+  static readonly MIN_LENGTH = '$property は $constraint1 文字以上で入力してください';
+  static readonly MAX_LENGTH = '$property は $constraint1 文字以内で入力してください';
+  static readonly LENGTH = '$property は $constraint1 文字から $constraint2 文字の間で入力してください';
+
+  // 数値範囲メッセージ
+  static readonly MIN = '$property は $constraint1 以上である必要があります';
+  static readonly MAX = '$property は $constraint1 以下である必要があります';
+  static readonly IS_POSITIVE = '$property は正の数である必要があります';
+  static readonly IS_INT = '$property は整数である必要があります';
+
+  // 配列メッセージ
+  static readonly ARRAY_MIN_SIZE = '$property は $constraint1 個以上選択してください';
+  static readonly ARRAY_MAX_SIZE = '$property は $constraint1 個以下で選択してください';
+  static readonly ARRAY_NOT_EMPTY = '$property は1つ以上選択してください';
+
+  // 正規表現メッセージ
+  static readonly MATCHES = '$property の形式が正しくありません';
+
+  // 列挙型メッセージ
+  static readonly IS_ENUM = '$property は有効な値を選択してください';
+
+  // カスタムメッセージ
+  static readonly PASSWORD_WEAK = 'パスワードには英字と数字を含めてください';
+  static readonly COLOR_CODE_INVALID = 'カラーコードは #RRGGBB 形式で入力してください';
+  static readonly DISPLAY_NAME_INVALID_CHARS = '表示名に使用できない文字が含まれています';
+  static readonly DATE_IN_FUTURE = '日時は現在より未来の時刻を指定してください';
+  static readonly DATE_TOO_FAR = '日時が未来すぎます';
+  static readonly FILE_TOO_LARGE = 'ファイルサイズが制限を超えています';
+  static readonly INVALID_IMAGE_TYPE = '有効な画像ファイルを選択してください';
+}
+
+// =============================================================================
 // カスタムバリデーター用ヘルパー
 // =============================================================================
 
@@ -154,26 +128,14 @@ export class ValidationHelpers {
    * 弱いパスワードかどうかチェック
    */
   static isWeakPassword(password: string): boolean {
-    const weakPasswords = [
-      'password',
-      '12345678',
-      'qwerty',
-      'admin',
-      'user',
-      'test',
-      '123456789',
-      'password123',
-      'admin123',
-    ];
-    return weakPasswords.includes(password.toLowerCase());
+    return (UserConstants.WEAK_PASSWORDS as readonly string[]).includes(password.toLowerCase());
   }
 
   /**
    * 画像URLかどうかチェック
    */
   static isImageUrl(url: string): boolean {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-    return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+    return UserConstants.ALLOWED_IMAGE_EXTENSIONS.some(ext => url.toLowerCase().endsWith(ext));
   }
 
   /**
@@ -200,4 +162,79 @@ export class ValidationHelpers {
   static isValidColorCode(color: string): boolean {
     return ValidationPatterns.COLOR_CODE.test(color);
   }
+
+  /**
+   * パスワード強度チェック
+   */
+  static isStrongPassword(password: string): boolean {
+    return ValidationPatterns.PASSWORD_STRONG.test(password);
+  }
+
+  /**
+   * ファイルサイズチェック
+   */
+  static isValidFileSize(fileSize: number, maxSize: number = ValidationLimits.FILE_SIZE_MAX): boolean {
+    return fileSize <= maxSize;
+  }
+
+  /**
+   * 画像ファイル拡張子チェック
+   */
+  static isValidImageExtension(filename: string): boolean {
+    const extension = filename.toLowerCase().substring(filename.lastIndexOf('.'));
+    return (UserConstants.ALLOWED_IMAGE_EXTENSIONS as readonly string[]).includes(extension);
+  }
+}
+
+// =============================================================================
+// DTOバリデーション用デコレータオプション
+// =============================================================================
+
+export class ValidationOptions {
+  // メール用
+  static readonly EMAIL = {
+    pattern: ValidationPatterns.EMAIL,
+    maxLength: ValidationLimits.EMAIL_MAX_LENGTH,
+    message: ValidationMessages.IS_EMAIL,
+  };
+
+  // パスワード用
+  static readonly PASSWORD = {
+    minLength: ValidationLimits.PASSWORD_MIN_LENGTH,
+    maxLength: ValidationLimits.PASSWORD_MAX_LENGTH,
+    pattern: ValidationPatterns.PASSWORD_STRONG,
+  };
+
+  // 表示名用
+  static readonly DISPLAY_NAME = {
+    minLength: ValidationLimits.DISPLAY_NAME_MIN_LENGTH,
+    maxLength: ValidationLimits.DISPLAY_NAME_MAX_LENGTH,
+    pattern: ValidationPatterns.DISPLAY_NAME,
+  };
+
+  // タスクタイトル用
+  static readonly TASK_TITLE = {
+    minLength: ValidationLimits.TASK_TITLE_MIN_LENGTH,
+    maxLength: ValidationLimits.TASK_TITLE_MAX_LENGTH,
+    pattern: ValidationPatterns.TASK_TITLE,
+  };
+
+  // タグ名用
+  static readonly TAG_NAME = {
+    minLength: ValidationLimits.TAG_NAME_MIN_LENGTH,
+    maxLength: ValidationLimits.TAG_NAME_MAX_LENGTH,
+    pattern: ValidationPatterns.TAG_NAME,
+  };
+
+  // カラーコード用
+  static readonly COLOR_CODE = {
+    pattern: ValidationPatterns.COLOR_CODE,
+    message: ValidationMessages.COLOR_CODE_INVALID,
+  };
+
+  // UUID用
+  static readonly UUID = {
+    pattern: ValidationPatterns.UUID_V4,
+    message: ValidationMessages.IS_UUID,
+  };
 }

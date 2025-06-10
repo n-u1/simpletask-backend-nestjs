@@ -1,5 +1,48 @@
+/**
+ * アプリケーション基本定数
+ * ドメイン設定・制約値・列挙型・ヘルパー関数を統一管理
+ */
+
 // =============================================================================
-// 認証・ユーザー関連定数
+// アプリケーション基本設定
+// =============================================================================
+
+export class AppConstants {
+  // API設定
+  static readonly API_VERSION = 'v1';
+  static readonly API_PREFIX = 'api/v1';
+
+  // ページネーション設定
+  static readonly DEFAULT_PAGE_SIZE = 20;
+  static readonly MAX_PAGE_SIZE = 100;
+  static readonly MIN_PAGE_SIZE = 1;
+
+  // 検索・フィルタリング設定
+  static readonly SEARCH_MIN_LENGTH = 1;
+  static readonly SEARCH_MAX_LENGTH = 100;
+
+  // ソート設定
+  static readonly DEFAULT_SORT_FIELD = 'created_at';
+  static readonly DEFAULT_SORT_ORDER = 'desc';
+  static readonly ALLOWED_SORT_ORDERS = ['asc', 'desc'] as const;
+
+  // タスク用ソート可能フィールド
+  static readonly TASK_SORTABLE_FIELDS = [
+    'created_at',
+    'updated_at',
+    'title',
+    'status',
+    'priority',
+    'due_date',
+    'position',
+  ] as const;
+
+  // タグ用ソート可能フィールド
+  static readonly TAG_SORTABLE_FIELDS = ['created_at', 'updated_at', 'name'] as const;
+}
+
+// =============================================================================
+// ユーザー関連定数
 // =============================================================================
 
 export class UserConstants {
@@ -28,13 +71,13 @@ export class UserConstants {
     '123456789',
     'password123',
     'admin123',
-  ];
+  ] as const;
 
   // 表示名に使用可能な文字パターン
   static readonly DISPLAY_NAME_PATTERN = /^[a-zA-Z0-9ぁ-んァ-ヶー一-龠\s\-_.]+$/;
 
   // 画像ファイル拡張子
-  static readonly ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+  static readonly ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const;
 }
 
 // =============================================================================
@@ -55,8 +98,8 @@ export class TaskConstants {
 
   // デフォルト値
   static readonly DEFAULT_POSITION = 0;
-  static readonly DEFAULT_STATUS = 'todo';
-  static readonly DEFAULT_PRIORITY = 'medium';
+  static readonly DEFAULT_STATUS = 'todo' as const;
+  static readonly DEFAULT_PRIORITY = 'medium' as const;
 }
 
 export enum TaskStatus {
@@ -101,115 +144,11 @@ export class TagConstants {
     '#F97316', // Orange
     '#06B6D4', // Cyan
     '#84CC16', // Lime
-  ];
+  ] as const;
 }
 
 // =============================================================================
-// API関連定数
-// =============================================================================
-
-export class APIConstants {
-  // ページネーション設定
-  static readonly DEFAULT_PAGE_SIZE = 20;
-  static readonly MAX_PAGE_SIZE = 100;
-  static readonly MIN_PAGE_SIZE = 1;
-
-  // 検索・フィルタリング設定
-  static readonly SEARCH_MIN_LENGTH = 1;
-  static readonly SEARCH_MAX_LENGTH = 100;
-
-  // ソート設定
-  static readonly DEFAULT_SORT_FIELD = 'created_at';
-  static readonly DEFAULT_SORT_ORDER = 'desc';
-
-  static readonly ALLOWED_SORT_ORDERS = ['asc', 'desc'];
-
-  // タスク用ソート可能フィールド
-  static readonly TASK_SORTABLE_FIELDS = [
-    'created_at',
-    'updated_at',
-    'title',
-    'status',
-    'priority',
-    'due_date',
-    'position',
-  ];
-
-  // タグ用ソート可能フィールド
-  static readonly TAG_SORTABLE_FIELDS = ['created_at', 'updated_at', 'name'];
-}
-
-// =============================================================================
-// エラーメッセージ定数（FastAPI版を流用）
-// =============================================================================
-
-export class ErrorMessages {
-  // 認証関連
-  static readonly INVALID_CREDENTIALS = 'メールアドレスまたはパスワードが正しくありません';
-  static readonly USER_NOT_FOUND = 'ユーザーが見つかりません';
-  static readonly USER_INACTIVE = 'アカウントが無効化されています';
-  static readonly EMAIL_ALREADY_EXISTS = 'このメールアドレスは既に登録されています';
-
-  // パスワード関連
-  static readonly PASSWORD_TOO_SHORT = `パスワードは${UserConstants.PASSWORD_MIN_LENGTH}文字以上である必要があります`;
-  static readonly PASSWORD_TOO_LONG = `パスワードは${UserConstants.PASSWORD_MAX_LENGTH}文字以内で入力してください`;
-  static readonly PASSWORD_NO_LETTERS = 'パスワードには英字を含めてください';
-  static readonly PASSWORD_NO_NUMBERS = 'パスワードには数字を含めてください';
-  static readonly PASSWORD_TOO_WEAK = 'このパスワードは簡単すぎるため使用できません';
-
-  // 表示名関連
-  static readonly DISPLAY_NAME_TOO_SHORT = `表示名は${UserConstants.DISPLAY_NAME_MIN_LENGTH}文字以上で入力してください`;
-  static readonly DISPLAY_NAME_TOO_LONG = `表示名は${UserConstants.DISPLAY_NAME_MAX_LENGTH}文字以内で入力してください`;
-  static readonly DISPLAY_NAME_INVALID_CHARS = '表示名に使用できない文字が含まれています';
-
-  // タスク関連
-  static readonly TASK_NOT_FOUND = 'タスクが見つかりません';
-  static readonly TASK_TITLE_REQUIRED = 'タスクタイトルは必須です';
-  static readonly TASK_TITLE_TOO_LONG = `タスクタイトルは${TaskConstants.TITLE_MAX_LENGTH}文字以内で入力してください`;
-  static readonly TASK_ACCESS_DENIED = 'このタスクにアクセスする権限がありません';
-
-  // タグ関連
-  static readonly TAG_NOT_FOUND = 'タグが見つかりません';
-  static readonly TAG_NAME_REQUIRED = 'タグ名は必須です';
-  static readonly TAG_NAME_TOO_LONG = `タグ名は${TagConstants.NAME_MAX_LENGTH}文字以内で入力してください`;
-  static readonly TAG_NAME_DUPLICATE = 'このタグ名は既に使用されています';
-  static readonly TAG_COLOR_INVALID = '有効なカラーコード（#RRGGBB形式）を入力してください';
-  static readonly TAG_ACCESS_DENIED = 'このタグにアクセスする権限がありません';
-
-  // 一般的なエラー
-  static readonly VALIDATION_ERROR = '入力値に誤りがあります';
-  static readonly SERVER_ERROR = 'サーバーエラーが発生しました';
-  static readonly NOT_FOUND = 'リソースが見つかりません';
-  static readonly UNAUTHORIZED = '認証が必要です';
-  static readonly FORBIDDEN = 'アクセスが拒否されました';
-  static readonly RATE_LIMIT_EXCEEDED = 'リクエスト制限を超過しました';
-}
-
-// =============================================================================
-// 成功メッセージ定数（FastAPI版を流用）
-// =============================================================================
-
-export class SuccessMessages {
-  // 認証関連
-  static readonly USER_CREATED = 'ユーザーが正常に作成されました';
-  static readonly LOGIN_SUCCESS = 'ログインしました';
-  static readonly LOGOUT_SUCCESS = 'ログアウトしました';
-  static readonly PASSWORD_CHANGED = 'パスワードが変更されました';
-
-  // タスク関連
-  static readonly TASK_CREATED = 'タスクが作成されました';
-  static readonly TASK_UPDATED = 'タスクが更新されました';
-  static readonly TASK_DELETED = 'タスクが削除されました';
-  static readonly TASK_STATUS_UPDATED = 'タスクのステータスが更新されました';
-
-  // タグ関連
-  static readonly TAG_CREATED = 'タグが作成されました';
-  static readonly TAG_UPDATED = 'タグが更新されました';
-  static readonly TAG_DELETED = 'タグが削除されました';
-}
-
-// =============================================================================
-// ヘルパー関数（FastAPI版を流用）
+// ヘルパー関数
 // =============================================================================
 
 export function validateColorCode(color: string): boolean {
@@ -217,17 +156,28 @@ export function validateColorCode(color: string): boolean {
 }
 
 export function validateDisplayName(name: string): boolean {
-  if (!name || name.trim().length < UserConstants.DISPLAY_NAME_MIN_LENGTH) {
+  if (!name?.trim()) {
     return false;
   }
 
-  if (name.trim().length > UserConstants.DISPLAY_NAME_MAX_LENGTH) {
+  const trimmed = name.trim();
+
+  if (trimmed.length < UserConstants.DISPLAY_NAME_MIN_LENGTH) {
     return false;
   }
 
-  return UserConstants.DISPLAY_NAME_PATTERN.test(name.trim());
+  if (trimmed.length > UserConstants.DISPLAY_NAME_MAX_LENGTH) {
+    return false;
+  }
+
+  return UserConstants.DISPLAY_NAME_PATTERN.test(trimmed);
 }
 
 export function isWeakPassword(password: string): boolean {
-  return UserConstants.WEAK_PASSWORDS.includes(password.toLowerCase());
+  return (UserConstants.WEAK_PASSWORDS as readonly string[]).includes(password.toLowerCase());
+}
+
+export function isValidImageExtension(filename: string): boolean {
+  const extension = filename.toLowerCase().substring(filename.lastIndexOf('.'));
+  return (UserConstants.ALLOWED_IMAGE_EXTENSIONS as readonly string[]).includes(extension);
 }
