@@ -63,12 +63,20 @@ export class ValidationErrorMessages {
   static readonly TASK_PRIORITY_INVALID = '無効な優先度です';
   static readonly TASK_POSITION_INVALID = `位置は${TaskConstants.POSITION_MIN}以上${TaskConstants.POSITION_MAX}以下で入力してください`;
   static readonly TASK_DUE_DATE_INVALID = '有効な日時を入力してください';
+  static readonly TASK_ID_REQUIRED = 'タスクIDは必須です';
 
   // タグ関連
   static readonly TAG_NAME_REQUIRED = 'タグ名は必須です';
   static readonly TAG_NAME_TOO_LONG = `タグ名は${TagConstants.NAME_MAX_LENGTH}文字以内で入力してください`;
   static readonly TAG_COLOR_INVALID = '有効なカラーコード（#RRGGBB形式）を入力してください';
   static readonly TAG_DESCRIPTION_TOO_LONG = `タグ説明は${TagConstants.DESCRIPTION_MAX_LENGTH}文字以内で入力してください`;
+  static readonly TAG_ID_REQUIRED = 'タグIDは必須です';
+
+  // タスク・タグ関連付け
+  static readonly TASK_TAG_IDS_SAME = 'タスクIDとタグIDを同じにすることはできません';
+  static readonly TASK_TAG_ASSOCIATION_INVALID = '無効なタスク・タグの関連付けです';
+  static readonly TASK_TAG_ALREADY_EXISTS = 'このタスクとタグの関連付けは既に存在します';
+  static readonly TASK_TAG_NOT_FOUND = 'タスクとタグの関連付けが見つかりません';
 
   // UUID関連
   static readonly UUID_INVALID = '有効なUUIDを入力してください';
