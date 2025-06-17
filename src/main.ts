@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -29,7 +29,9 @@ async function bootstrap(): Promise<void> {
   );
 
   // APIプレフィックス
-  app.setGlobalPrefix(configService.getOrThrow<string>('app.apiPrefix'));
+  app.setGlobalPrefix(configService.getOrThrow<string>('app.apiPrefix'), {
+    exclude: [{ path: 'health', method: RequestMethod.GET }],
+  });
 
   // Swagger設定
   const config = new DocumentBuilder()
