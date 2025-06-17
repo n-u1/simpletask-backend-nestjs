@@ -11,7 +11,7 @@ NestJS を用いたバックエンド開発を試行する個人プロジェク�
 Python の FastAPI でも別途同じアプリケーションをテーマに開発を行っているため、  
 基本的な内容はそちらに準ずる形とし、技術スタックを NestJS に変えて実装する。
 
-関連リンク: [FastAPI版「SimpleTask」](ttps://github.com/n-u1/simpletask-backend-fastapi)
+関連リンク: [FastAPI版「SimpleTask」](https://github.com/n-u1/simpletask-backend-fastapi)
 
 ### プロジェクトの方針
 
