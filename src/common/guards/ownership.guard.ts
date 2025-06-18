@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { Tag } from '@/tags/entities/tag.entity';
 import { Task } from '@/tasks/entities/task.entity';
 import { User } from '@/users/entities/user.entity';
+import { AuthErrorMessages, GeneralErrorMessages } from '@common/constants/error-messages.constants';
 import { BusinessLogicException } from '@common/exceptions/business-logic.exception';
 import { ResourceNotFoundException } from '@common/exceptions/resource-not-found.exception';
 
@@ -61,7 +62,7 @@ export class OwnershipGuard implements CanActivate {
     // 認証されたユーザーを取得
     const user = this.extractUser(request);
     if (!user) {
-      throw new BusinessLogicException('認証が必要です', 'AUTHENTICATION_REQUIRED', {}, 'OwnershipGuard');
+      throw new BusinessLogicException(AuthErrorMessages.UNAUTHORIZED, 'UNAUTHORIZED', {}, 'OwnershipGuard');
     }
 
     try {
@@ -86,7 +87,7 @@ export class OwnershipGuard implements CanActivate {
 
     if (!resourceId) {
       throw new BusinessLogicException(
-        'リソースIDが指定されていません',
+        GeneralErrorMessages.MISSING_RESOURCE_ID,
         'MISSING_RESOURCE_ID',
         { paramName: config.paramName ?? 'id' },
         'OwnershipGuard',
@@ -127,7 +128,7 @@ export class OwnershipGuard implements CanActivate {
 
       default:
         throw new BusinessLogicException(
-          '未対応のリソースタイプです',
+          GeneralErrorMessages.UNSUPPORTED_RESOURCE_TYPE,
           'UNSUPPORTED_RESOURCE_TYPE',
           { resourceType },
           'OwnershipGuard',

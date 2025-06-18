@@ -136,7 +136,7 @@ export class Tag extends BaseEntity {
     const trimmed = this.description.trim();
 
     if (trimmed.length > TagConstants.DESCRIPTION_MAX_LENGTH) {
-      throw new Error(`タグ説明は${TagConstants.DESCRIPTION_MAX_LENGTH}文字以内で入力してください`);
+      throw new Error(ValidationErrorMessages.TAG_DESCRIPTION_TOO_LONG);
     }
 
     this.description = trimmed || null;

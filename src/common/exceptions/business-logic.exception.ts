@@ -1,5 +1,13 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
+import {
+  AuthErrorMessages,
+  GeneralErrorMessages,
+  ResourceErrorMessages,
+  SystemErrorMessages,
+  ValidationErrorMessages,
+} from '@common/constants/error-messages.constants';
+
 /**
  * ビジネスロジック例外
  * アプリケーション固有のビジネスルール違反を表す例外クラス
@@ -56,9 +64,9 @@ export class BusinessLogicException extends HttpException {
    */
   static invalidCredentials(email?: string, context = 'AuthService'): BusinessLogicException {
     return new BusinessLogicException(
-      'メールアドレスまたはパスワードが正しくありません',
-      'INVALID_CREDENTIALS',
-      { email: email ? `${email.slice(0, 3)}***` : 'unknown' }, // セキュリティ: 一部マスキング
+      AuthErrorMessages.CREDENTIALS_INVALID,
+      'CREDENTIALS_INVALID',
+      { email: email ? `${email.slice(0, 3)}***` : 'unknown' },
       context,
     );
   }
@@ -68,7 +76,7 @@ export class BusinessLogicException extends HttpException {
    */
   static accountLocked(lockedUntil: Date, context = 'AuthService'): BusinessLogicException {
     return new BusinessLogicException(
-      'アカウントがロックされています。しばらく時間をおいて再度お試しください',
+      AuthErrorMessages.ACCOUNT_LOCKED,
       'ACCOUNT_LOCKED',
       {
         lockedUntil: lockedUntil.toISOString(),
@@ -83,9 +91,9 @@ export class BusinessLogicException extends HttpException {
    */
   static emailAlreadyExists(email: string, context = 'UserService'): BusinessLogicException {
     return new BusinessLogicException(
-      'このメールアドレスは既に登録されています',
+      AuthErrorMessages.EMAIL_ALREADY_EXISTS,
       'EMAIL_ALREADY_EXISTS',
-      { email: `${email.slice(0, 3)}***` }, // セキュリティ: 一部マスキング
+      { email: `${email.slice(0, 3)}***` },
       context,
     );
   }
@@ -95,8 +103,8 @@ export class BusinessLogicException extends HttpException {
    */
   static weakPassword(context = 'UserService'): BusinessLogicException {
     return new BusinessLogicException(
-      'パスワードが弱すぎます。英字と数字を含む8文字以上で設定してください',
-      'WEAK_PASSWORD',
+      ValidationErrorMessages.PASSWORD_TOO_WEAK,
+      'PASSWORD_TOO_WEAK',
       {
         requirements: ['8文字以上', '英字を含む', '数字を含む', '一般的なパスワードは使用不可'],
       },
@@ -114,8 +122,8 @@ export class BusinessLogicException extends HttpException {
     context = 'TaskService',
   ): BusinessLogicException {
     return new BusinessLogicException(
-      `タスクの状態を '${currentStatus}' から '${targetStatus}' に変更することはできません`,
-      'INVALID_STATUS_TRANSITION',
+      ValidationErrorMessages.TASK_STATUS_TRANSITION_INVALID,
+      'TASK_STATUS_TRANSITION_INVALID',
       {
         taskId,
         currentStatus,
@@ -131,7 +139,7 @@ export class BusinessLogicException extends HttpException {
    */
   static tagNameDuplicate(tagName: string, userId: string, context = 'TagService'): BusinessLogicException {
     return new BusinessLogicException(
-      'このタグ名は既に使用されています',
+      ResourceErrorMessages.TAG_NAME_DUPLICATE,
       'TAG_NAME_DUPLICATE',
       {
         tagName,
@@ -151,7 +159,7 @@ export class BusinessLogicException extends HttpException {
     context = 'TaskTagService',
   ): BusinessLogicException {
     return new BusinessLogicException(
-      'タスクとタグの関連付けに失敗しました',
+      ValidationErrorMessages.TASK_TAG_ASSOCIATION_FAILED,
       'TASK_TAG_ASSOCIATION_FAILED',
       {
         taskId,
@@ -171,13 +179,16 @@ export class BusinessLogicException extends HttpException {
     userId: string,
     context = 'OwnershipGuard',
   ): BusinessLogicException {
+    // リソースタイプに応じて具体的なメッセージか汎用メッセージかを選択
+    const message = getAccessDeniedMessage(resourceType);
+
     return new BusinessLogicException(
-      'このリソースにアクセスする権限がありません',
+      message,
       'ACCESS_DENIED',
       {
         resourceType,
         resourceId,
-        userId: `user_${userId.slice(-8)}`, // セキュリティ: 末尾8文字のみ
+        userId: `user_${userId.slice(-8)}`,
       },
       context,
     );
@@ -195,8 +206,8 @@ export class BusinessLogicException extends HttpException {
     context = 'ValidationPipe',
   ): BusinessLogicException {
     return new BusinessLogicException(
-      '入力値に誤りがあります',
-      'VALIDATION_FAILED',
+      GeneralErrorMessages.VALIDATION_ERROR,
+      'VALIDATION_ERROR',
       {
         errors: errors.map(error => ({
           field: error.field,
@@ -213,7 +224,7 @@ export class BusinessLogicException extends HttpException {
    */
   static rateLimitExceeded(limit: number, windowMs: number, context = 'ThrottlerGuard'): BusinessLogicException {
     return new BusinessLogicException(
-      'リクエスト制限を超過しました。しばらく時間をおいて再度お試しください',
+      SystemErrorMessages.RATE_LIMIT_EXCEEDED,
       'RATE_LIMIT_EXCEEDED',
       {
         limit,
@@ -229,7 +240,7 @@ export class BusinessLogicException extends HttpException {
    */
   static fileTooLarge(actualSize: number, maxSize: number, context = 'FileUploadService'): BusinessLogicException {
     return new BusinessLogicException(
-      'ファイルサイズが制限を超えています',
+      ValidationErrorMessages.FILE_TOO_LARGE,
       'FILE_TOO_LARGE',
       {
         actualSizeMB: Math.round((actualSize / 1024 / 1024) * 100) / 100,
@@ -248,8 +259,8 @@ export class BusinessLogicException extends HttpException {
     context = 'FileUploadService',
   ): BusinessLogicException {
     return new BusinessLogicException(
-      '無効なファイル形式です',
-      'INVALID_FILE_TYPE',
+      ValidationErrorMessages.FILE_TYPE_INVALID,
+      'FILE_TYPE_INVALID',
       {
         actualType,
         allowedTypes,
@@ -305,6 +316,22 @@ export class BusinessLogicException extends HttpException {
 }
 
 /**
+ * リソースタイプに応じたアクセス拒否メッセージを取得
+ */
+function getAccessDeniedMessage(resourceType: string): string {
+  const resourceMessages: Record<string, string> = {
+    task: ResourceErrorMessages.TASK_ACCESS_DENIED,
+    tag: ResourceErrorMessages.TAG_ACCESS_DENIED,
+    user: ResourceErrorMessages.USER_ACCESS_DENIED,
+  };
+
+  const resourceKey = resourceType.toLowerCase();
+  const specificMessage = resourceMessages[resourceKey];
+
+  return specificMessage ?? ResourceErrorMessages.RESOURCE_ACCESS_DENIED;
+}
+
+/**
  * タスクステータス遷移の有効性をチェック
  */
 function getValidStatusTransitions(currentStatus: string): string[] {
@@ -312,7 +339,7 @@ function getValidStatusTransitions(currentStatus: string): string[] {
     todo: ['in_progress', 'done', 'archived'],
     in_progress: ['todo', 'done', 'archived'],
     done: ['todo', 'in_progress', 'archived'],
-    archived: ['todo'], // アーカイブからは TODO にのみ戻せる
+    archived: ['todo'],
   };
 
   return transitions[currentStatus] ?? [];

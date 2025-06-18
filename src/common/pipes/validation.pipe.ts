@@ -8,6 +8,7 @@ import {
   ValidationPipeOptions,
 } from '@nestjs/common';
 
+import { GeneralErrorMessages, ValidationErrorMessages } from '@common/constants/error-messages.constants';
 import { ValidationMessages } from '@common/constants/validation.constants';
 import { BusinessLogicException } from '@common/exceptions/business-logic.exception';
 
@@ -58,7 +59,7 @@ export class CustomValidationPipe implements PipeTransform {
       }
 
       throw BusinessLogicException.validationFailed(
-        [{ field: 'unknown', value: 'unknown', constraints: ['バリデーションエラーが発生しました'] }],
+        [{ field: 'unknown', value: 'unknown', constraints: [GeneralErrorMessages.VALIDATION_ERROR] }],
         'CustomValidationPipe',
       );
     }
@@ -79,7 +80,7 @@ export class CustomValidationPipe implements PipeTransform {
     const errors = messages.map((message, index) => ({
       field: `field_${index}`,
       value: 'unknown',
-      constraints: [typeof message === 'string' ? message : '不正な値です'],
+      constraints: [typeof message === 'string' ? message : GeneralErrorMessages.VALIDATION_ERROR],
     }));
 
     return BusinessLogicException.validationFailed(errors, 'CustomValidationPipe');
@@ -230,7 +231,7 @@ export class PositiveIntPipe implements PipeTransform {
           {
             field: metadata.data ?? 'number',
             value: value,
-            constraints: ['正の整数である必要があります'],
+            constraints: [ValidationErrorMessages.IS_POSITIVE_INT],
           },
         ],
         'PositiveIntPipe',
@@ -259,7 +260,7 @@ export class OptionalPositiveIntPipe implements PipeTransform {
           {
             field: metadata.data ?? 'number',
             value: value,
-            constraints: ['正の整数である必要があります'],
+            constraints: [ValidationErrorMessages.IS_POSITIVE_INT],
           },
         ],
         'OptionalPositiveIntPipe',

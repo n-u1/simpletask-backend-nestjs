@@ -116,7 +116,7 @@ export class ValidationMessages {
   static readonly DATE_IN_FUTURE = '日時は現在より未来の時刻を指定してください';
   static readonly DATE_TOO_FAR = '日時が未来すぎます';
   static readonly FILE_TOO_LARGE = 'ファイルサイズが制限を超えています';
-  static readonly INVALID_IMAGE_TYPE = '有効な画像ファイルを選択してください';
+  static readonly IMAGE_TYPE_INVALID = '有効な画像ファイルを選択してください';
 }
 
 // =============================================================================

@@ -1,4 +1,4 @@
-import { TagConstants, TaskConstants, UserConstants } from './app.constants';
+import { TagConstants, TaskConstants, TaskPriority, TaskStatus, UserConstants } from './app.constants';
 
 /**
  * エラーメッセージ定数
@@ -10,14 +10,18 @@ import { TagConstants, TaskConstants, UserConstants } from './app.constants';
 // =============================================================================
 
 export class AuthErrorMessages {
-  static readonly INVALID_CREDENTIALS = 'メールアドレスまたはパスワードが正しくありません';
+  static readonly CREDENTIALS_INVALID = 'メールアドレスまたはパスワードが正しくありません';
   static readonly USER_NOT_FOUND = 'ユーザーが見つかりません';
-  static readonly USER_INACTIVE = 'アカウントが無効化されています';
-  static readonly USER_LOCKED = 'アカウントがロックされています。しばらく時間をおいて再度お試しください';
+  static readonly ACCOUNT_INACTIVE = 'アカウントが無効化されています';
+  static readonly ACCOUNT_LOCKED = 'アカウントがロックされています。しばらく時間をおいて再度お試しください';
   static readonly EMAIL_ALREADY_EXISTS = 'このメールアドレスは既に登録されています';
   static readonly EMAIL_NOT_VERIFIED = 'メールアドレスが認証されていません';
+  static readonly TOKEN_INACTIVE = 'トークンがまだ有効ではありません';
   static readonly TOKEN_EXPIRED = 'トークンの有効期限が切れています';
   static readonly TOKEN_INVALID = '無効なトークンです';
+  static readonly REFRESH_TOKEN_INACTIVE = 'リフレッシュトークンがまだ有効ではありません';
+  static readonly REFRESH_TOKEN_EXPIRED = 'リフレッシュトークンの有効期限が切れています';
+  static readonly REFRESH_TOKEN_INVALID = 'リフレッシュトークンが無効です';
   static readonly UNAUTHORIZED = '認証が必要です';
   static readonly FORBIDDEN = 'アクセスが拒否されました';
   static readonly SESSION_EXPIRED = 'セッションの有効期限が切れています';
@@ -59,8 +63,9 @@ export class ValidationErrorMessages {
   static readonly TASK_TITLE_REQUIRED = 'タスクタイトルは必須です';
   static readonly TASK_TITLE_TOO_LONG = `タスクタイトルは${TaskConstants.TITLE_MAX_LENGTH}文字以内で入力してください`;
   static readonly TASK_DESCRIPTION_TOO_LONG = `タスク説明は${TaskConstants.DESCRIPTION_MAX_LENGTH}文字以内で入力してください`;
-  static readonly TASK_STATUS_INVALID = '無効なステータスです';
-  static readonly TASK_PRIORITY_INVALID = '無効な優先度です';
+  static readonly TASK_STATUS_INVALID = `ステータスは次のいずれかである必要があります: ${Object.values(TaskStatus).join(', ')}`;
+  static readonly TASK_STATUS_TRANSITION_INVALID = 'タスクの状態を変更することはできません';
+  static readonly TASK_PRIORITY_INVALID = `優先度は次のいずれかである必要があります: ${Object.values(TaskPriority).join(', ')}`;
   static readonly TASK_POSITION_INVALID = `位置は${TaskConstants.POSITION_MIN}以上${TaskConstants.POSITION_MAX}以下で入力してください`;
   static readonly TASK_DUE_DATE_INVALID = '有効な日時を入力してください';
   static readonly TASK_ID_REQUIRED = 'タスクIDは必須です';
@@ -75,6 +80,7 @@ export class ValidationErrorMessages {
   // タスク・タグ関連付け
   static readonly TASK_TAG_IDS_SAME = 'タスクIDとタグIDを同じにすることはできません';
   static readonly TASK_TAG_ASSOCIATION_INVALID = '無効なタスク・タグの関連付けです';
+  static readonly TASK_TAG_ASSOCIATION_FAILED = 'タスクとタグの関連付けに失敗しました';
   static readonly TASK_TAG_ALREADY_EXISTS = 'このタスクとタグの関連付けは既に存在します';
   static readonly TASK_TAG_NOT_FOUND = 'タスクとタグの関連付けが見つかりません';
 
@@ -91,6 +97,7 @@ export class ValidationErrorMessages {
   static readonly NUMBER_TOO_SMALL = '値が小さすぎます';
   static readonly NUMBER_TOO_LARGE = '値が大きすぎます';
   static readonly INTEGER_INVALID = '整数を入力してください';
+  static readonly IS_POSITIVE_INT = '正の整数である必要があります';
 
   // 配列関連
   static readonly ARRAY_EMPTY = '1つ以上選択してください';
@@ -103,7 +110,7 @@ export class ValidationErrorMessages {
   // ファイル関連
   static readonly FILE_REQUIRED = 'ファイルは必須です';
   static readonly FILE_TOO_LARGE = 'ファイルサイズが大きすぎます';
-  static readonly FILE_INVALID_TYPE = 'サポートされていないファイル形式です';
+  static readonly FILE_TYPE_INVALID = '無効なファイル形式です';
 }
 
 // =============================================================================
@@ -117,12 +124,23 @@ export class ResourceErrorMessages {
 
   // タスク関連
   static readonly TASK_NOT_FOUND = 'タスクが見つかりません';
+  static readonly TASKS_PARTIAL_NOT_FOUND = 'タスクのうち一部が見つかりません';
   static readonly TASK_ACCESS_DENIED = 'このタスクにアクセスする権限がありません';
 
   // タグ関連
   static readonly TAG_NOT_FOUND = 'タグが見つかりません';
   static readonly TAG_ACCESS_DENIED = 'このタグにアクセスする権限がありません';
   static readonly TAG_NAME_DUPLICATE = 'このタグ名は既に使用されています';
+
+  // 汎用リソース関連
+  static readonly RESOURCE_ACCESS_DENIED = 'このリソースにアクセスする権限がありません';
+
+  // その他のリソース関連
+  static readonly PAGE_NOT_FOUND = '指定されたページにはリソースが存在しません';
+  static readonly SEARCH_NO_RESULTS = '検索条件に一致するリソースが見つかりません';
+  static readonly FILE_NOT_FOUND = 'ファイルが見つかりません';
+  static readonly CONFIG_NOT_FOUND = '設定値が見つかりません';
+  static readonly ENDPOINT_NOT_FOUND = 'APIエンドポイントが見つかりません';
 }
 
 // =============================================================================
@@ -170,49 +188,9 @@ export class GeneralErrorMessages {
   static readonly FEATURE_NOT_AVAILABLE = 'この機能は利用できません';
   static readonly TEMPORARILY_UNAVAILABLE = '一時的に利用できません';
   static readonly VALIDATION_ERROR = '入力値に誤りがあります';
-}
-
-// =============================================================================
-// 統合エラーメッセージクラス
-// =============================================================================
-
-export class ErrorMessages {
-  // 認証関連
-  static readonly INVALID_CREDENTIALS = AuthErrorMessages.INVALID_CREDENTIALS;
-  static readonly USER_NOT_FOUND = AuthErrorMessages.USER_NOT_FOUND;
-  static readonly USER_INACTIVE = AuthErrorMessages.USER_INACTIVE;
-  static readonly EMAIL_ALREADY_EXISTS = AuthErrorMessages.EMAIL_ALREADY_EXISTS;
-  static readonly UNAUTHORIZED = AuthErrorMessages.UNAUTHORIZED;
-  static readonly FORBIDDEN = AuthErrorMessages.FORBIDDEN;
-
-  // バリデーション関連
-  static readonly VALIDATION_ERROR = GeneralErrorMessages.VALIDATION_ERROR;
-  static readonly PASSWORD_TOO_SHORT = ValidationErrorMessages.PASSWORD_TOO_SHORT;
-  static readonly PASSWORD_TOO_LONG = ValidationErrorMessages.PASSWORD_TOO_LONG;
-  static readonly PASSWORD_TOO_WEAK = ValidationErrorMessages.PASSWORD_TOO_WEAK;
-  static readonly DISPLAY_NAME_TOO_SHORT = ValidationErrorMessages.DISPLAY_NAME_TOO_SHORT;
-  static readonly DISPLAY_NAME_TOO_LONG = ValidationErrorMessages.DISPLAY_NAME_TOO_LONG;
-  static readonly DISPLAY_NAME_INVALID_CHARS = ValidationErrorMessages.DISPLAY_NAME_INVALID;
-
-  // リソース関連
-  static readonly TASK_NOT_FOUND = ResourceErrorMessages.TASK_NOT_FOUND;
-  static readonly TASK_TITLE_REQUIRED = ValidationErrorMessages.TASK_TITLE_REQUIRED;
-  static readonly TASK_TITLE_TOO_LONG = ValidationErrorMessages.TASK_TITLE_TOO_LONG;
-  static readonly TASK_ACCESS_DENIED = ResourceErrorMessages.TASK_ACCESS_DENIED;
-  static readonly TAG_NOT_FOUND = ResourceErrorMessages.TAG_NOT_FOUND;
-  static readonly TAG_NAME_REQUIRED = ValidationErrorMessages.TAG_NAME_REQUIRED;
-  static readonly TAG_NAME_TOO_LONG = ValidationErrorMessages.TAG_NAME_TOO_LONG;
-  static readonly TAG_NAME_DUPLICATE = ResourceErrorMessages.TAG_NAME_DUPLICATE;
-  static readonly TAG_COLOR_INVALID = ValidationErrorMessages.TAG_COLOR_INVALID;
-  static readonly TAG_ACCESS_DENIED = ResourceErrorMessages.TAG_ACCESS_DENIED;
-
-  // エンティティ関連
-  static readonly ENTITY_ID_REQUIRED = EntityErrorMessages.ENTITY_ID_REQUIRED;
-  static readonly ENTITY_CREATED_AT_REQUIRED = EntityErrorMessages.ENTITY_CREATED_AT_REQUIRED;
-  static readonly ENTITY_UPDATED_AT_REQUIRED = EntityErrorMessages.ENTITY_UPDATED_AT_REQUIRED;
-
-  // システム関連
-  static readonly SERVER_ERROR = SystemErrorMessages.SERVER_ERROR;
-  static readonly NOT_FOUND = GeneralErrorMessages.NOT_FOUND;
-  static readonly RATE_LIMIT_EXCEEDED = SystemErrorMessages.RATE_LIMIT_EXCEEDED;
+  static readonly MISSING_RESOURCE_ID = 'リソースIDが指定されていません';
+  static readonly UNSUPPORTED_RESOURCE_TYPE = '未対応のリソースタイプです';
+  static readonly USER_REGISTRATION_FAILED = 'ユーザー登録に失敗しました';
+  static readonly LOGIN_FAILED = 'ログインに失敗しました';
+  static readonly TOKEN_REFRESH_FAILED = 'トークンの更新に失敗しました';
 }

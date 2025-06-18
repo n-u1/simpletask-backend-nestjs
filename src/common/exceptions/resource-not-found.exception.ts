@@ -1,5 +1,11 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
+import {
+  GeneralErrorMessages,
+  ResourceErrorMessages,
+  ValidationErrorMessages,
+} from '@common/constants/error-messages.constants';
+
 /**
  * リソース未発見例外
  * 要求されたリソースが存在しない場合の例外クラス
@@ -48,8 +54,8 @@ export class ResourceNotFoundException extends HttpException {
     searchCriteria: Record<string, unknown> = {},
     context = 'Unknown',
   ) {
-    const defaultMessage = `${resourceType}が見つかりません`;
-    const finalMessage = message ?? defaultMessage;
+    // メッセージが指定されていない場合は、リソースタイプに応じたデフォルトメッセージを取得
+    const finalMessage = message ?? getResourceNotFoundMessage(resourceType);
 
     // HTTPException の基底クラスを初期化
     super(
@@ -90,7 +96,7 @@ export class ResourceNotFoundException extends HttpException {
    * ユーザーが見つからない場合
    */
   static user(userId: string, context = 'UserService'): ResourceNotFoundException {
-    return new ResourceNotFoundException('User', userId, 'ユーザーが見つかりません', {}, context);
+    return new ResourceNotFoundException('User', userId, ResourceErrorMessages.USER_NOT_FOUND, {}, context);
   }
 
   /**
@@ -99,8 +105,8 @@ export class ResourceNotFoundException extends HttpException {
   static userByEmail(email: string, context = 'AuthService'): ResourceNotFoundException {
     return new ResourceNotFoundException(
       'User',
-      email, // リソースIDとしてメールアドレスを使用
-      'ユーザーが見つかりません',
+      email,
+      ResourceErrorMessages.USER_NOT_FOUND,
       { searchBy: 'email' },
       context,
     );
@@ -112,7 +118,7 @@ export class ResourceNotFoundException extends HttpException {
   static task(taskId: string, userId?: string, context = 'TaskService'): ResourceNotFoundException {
     const searchCriteria = userId ? { ownerId: userId } : {};
 
-    return new ResourceNotFoundException('Task', taskId, 'タスクが見つかりません', searchCriteria, context);
+    return new ResourceNotFoundException('Task', taskId, ResourceErrorMessages.TASK_NOT_FOUND, searchCriteria, context);
   }
 
   /**
@@ -126,7 +132,7 @@ export class ResourceNotFoundException extends HttpException {
     return new ResourceNotFoundException(
       'Task',
       taskIds.join(','),
-      `${taskIds.length}件のタスクのうち一部が見つかりません`,
+      ResourceErrorMessages.TASKS_PARTIAL_NOT_FOUND,
       searchCriteria,
       context,
     );
@@ -138,7 +144,7 @@ export class ResourceNotFoundException extends HttpException {
   static tag(tagId: string, userId?: string, context = 'TagService'): ResourceNotFoundException {
     const searchCriteria = userId ? { ownerId: userId } : {};
 
-    return new ResourceNotFoundException('Tag', tagId, 'タグが見つかりません', searchCriteria, context);
+    return new ResourceNotFoundException('Tag', tagId, ResourceErrorMessages.TAG_NOT_FOUND, searchCriteria, context);
   }
 
   /**
@@ -148,7 +154,7 @@ export class ResourceNotFoundException extends HttpException {
     return new ResourceNotFoundException(
       'Tag',
       tagName,
-      'タグが見つかりません',
+      ResourceErrorMessages.TAG_NOT_FOUND,
       { searchBy: 'name', ownerId: userId },
       context,
     );
@@ -161,7 +167,7 @@ export class ResourceNotFoundException extends HttpException {
     return new ResourceNotFoundException(
       'TaskTag',
       `${taskId}:${tagId}`,
-      'タスクとタグの関連付けが見つかりません',
+      ValidationErrorMessages.TASK_TAG_NOT_FOUND,
       { taskId, tagId },
       context,
     );
@@ -179,7 +185,7 @@ export class ResourceNotFoundException extends HttpException {
     return new ResourceNotFoundException(
       resourceType,
       `page-${page}`,
-      `指定されたページには${resourceType}が存在しません`,
+      ResourceErrorMessages.PAGE_NOT_FOUND,
       { page, limit, searchType: 'pagination' },
       context,
     );
@@ -196,7 +202,7 @@ export class ResourceNotFoundException extends HttpException {
     return new ResourceNotFoundException(
       resourceType,
       'search-result',
-      `検索条件に一致する${resourceType}が見つかりません`,
+      ResourceErrorMessages.SEARCH_NO_RESULTS,
       { ...searchCriteria, searchType: 'criteria' },
       context,
     );
@@ -208,14 +214,26 @@ export class ResourceNotFoundException extends HttpException {
   static file(fileName: string, path?: string, context = 'FileService'): ResourceNotFoundException {
     const searchCriteria = path ? { path } : {};
 
-    return new ResourceNotFoundException('File', fileName, 'ファイルが見つかりません', searchCriteria, context);
+    return new ResourceNotFoundException(
+      'File',
+      fileName,
+      ResourceErrorMessages.FILE_NOT_FOUND,
+      searchCriteria,
+      context,
+    );
   }
 
   /**
    * 設定値が見つからない場合
    */
   static config(configKey: string, context = 'ConfigService'): ResourceNotFoundException {
-    return new ResourceNotFoundException('Config', configKey, '設定値が見つかりません', { configKey }, context);
+    return new ResourceNotFoundException(
+      'Config',
+      configKey,
+      ResourceErrorMessages.CONFIG_NOT_FOUND,
+      { configKey },
+      context,
+    );
   }
 
   /**
@@ -225,7 +243,7 @@ export class ResourceNotFoundException extends HttpException {
     return new ResourceNotFoundException(
       'Endpoint',
       `${method} ${path}`,
-      'APIエンドポイントが見つかりません',
+      ResourceErrorMessages.ENDPOINT_NOT_FOUND,
       { method, path },
       context,
     );
@@ -342,4 +360,23 @@ export class ResourceNotFoundException extends HttpException {
     this.details.searchScope = ResourceNotFoundException.maskSensitiveData(scope);
     return this;
   }
+}
+
+/**
+ * リソースタイプに応じたデフォルトメッセージを取得
+ */
+function getResourceNotFoundMessage(resourceType: string): string {
+  const typeMessages: Record<string, string> = {
+    user: ResourceErrorMessages.USER_NOT_FOUND,
+    task: ResourceErrorMessages.TASK_NOT_FOUND,
+    tag: ResourceErrorMessages.TAG_NOT_FOUND,
+    file: ResourceErrorMessages.FILE_NOT_FOUND,
+    config: ResourceErrorMessages.CONFIG_NOT_FOUND,
+    endpoint: ResourceErrorMessages.ENDPOINT_NOT_FOUND,
+  };
+
+  const resourceKey = resourceType.toLowerCase();
+  const specificMessage = typeMessages[resourceKey];
+
+  return specificMessage ?? GeneralErrorMessages.NOT_FOUND;
 }

@@ -158,15 +158,13 @@ export class Task extends BaseEntity {
 
   private validateStatus(): void {
     if (!Object.values(TaskStatus).includes(this.status)) {
-      const validStatuses = Object.values(TaskStatus).join(', ');
-      throw new Error(`ステータスは次のいずれかである必要があります: ${validStatuses}`);
+      throw new Error(ValidationErrorMessages.TASK_STATUS_INVALID);
     }
   }
 
   private validatePriority(): void {
     if (!Object.values(TaskPriority).includes(this.priority)) {
-      const validPriorities = Object.values(TaskPriority).join(', ');
-      throw new Error(`優先度は次のいずれかである必要があります: ${validPriorities}`);
+      throw new Error(ValidationErrorMessages.TASK_PRIORITY_INVALID);
     }
   }
 
@@ -211,7 +209,7 @@ export class Task extends BaseEntity {
 
   updatePosition(newPosition: number): void {
     if (newPosition < TaskConstants.POSITION_MIN || newPosition > TaskConstants.POSITION_MAX) {
-      throw new Error(`Position must be between ${TaskConstants.POSITION_MIN} and ${TaskConstants.POSITION_MAX}`);
+      throw new Error(ValidationErrorMessages.TASK_POSITION_INVALID);
     }
     this.position = newPosition;
   }
