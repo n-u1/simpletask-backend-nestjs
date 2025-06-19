@@ -10,13 +10,16 @@
 export class AuthSuccessMessages {
   static readonly USER_CREATED = 'ユーザーが正常に作成されました';
   static readonly USER_INFO_RETRIEVED = 'ユーザー情報を取得しました';
+  static readonly PROFILE_RETRIEVED = 'プロフィールを取得しました';
+  static readonly PROFILE_UPDATED = 'プロフィールが更新されました';
+  static readonly ACCOUNT_DEACTIVATED = 'アカウントが無効化されました';
   static readonly LOGIN_SUCCESS = 'ログインしました';
   static readonly LOGOUT_SUCCESS = 'ログアウトしました';
   static readonly PASSWORD_CHANGED = 'パスワードが変更されました';
   static readonly EMAIL_VERIFIED = 'メールアドレスが認証されました';
+  static readonly EMAIL_CHANGED = 'メールアドレスが変更されました';
   static readonly PASSWORD_RESET_SENT = 'パスワードリセット用のメールを送信しました';
   static readonly TOKEN_REFRESHED = 'トークンが更新されました';
-  static readonly PROFILE_UPDATED = 'プロフィールが更新されました';
 }
 
 // =============================================================================

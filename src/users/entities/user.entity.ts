@@ -40,7 +40,7 @@ export class User extends BaseEntity {
 
   @ApiProperty({
     description: '表示名',
-    example: '田中太郎',
+    example: '山田太郎',
     minLength: UserConstants.DISPLAY_NAME_MIN_LENGTH,
     maxLength: UserConstants.DISPLAY_NAME_MAX_LENGTH,
   })
@@ -199,7 +199,7 @@ export class User extends BaseEntity {
   override toPlainObject(): Record<string, unknown> {
     const plainObject = super.toPlainObject();
 
-    // セキュリティ情報を除外
+    // セキュリティに関わる情報は除外
     delete plainObject.passwordHash;
     delete plainObject.failedLoginAttempts;
     delete plainObject.lockedUntil;

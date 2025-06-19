@@ -51,7 +51,8 @@ export class ValidationErrorMessages {
   static readonly PASSWORD_TOO_WEAK = 'このパスワードは簡単すぎるため使用できません';
   static readonly PASSWORD_NO_LETTERS = 'パスワードには英字を含めてください';
   static readonly PASSWORD_NO_NUMBERS = 'パスワードには数字を含めてください';
-  static readonly PASSWORD_MISMATCH = 'パスワードが一致しません';
+  static readonly PASSWORD_INVALID = 'パスワードが正しくありません';
+  static readonly PASSWORD_CONFIRMATION_MISMATCH = 'パスワードと確認用パスワードが一致しません';
 
   // 表示名関連
   static readonly DISPLAY_NAME_REQUIRED = '表示名は必須です';
@@ -191,6 +192,10 @@ export class GeneralErrorMessages {
   static readonly MISSING_RESOURCE_ID = 'リソースIDが指定されていません';
   static readonly UNSUPPORTED_RESOURCE_TYPE = '未対応のリソースタイプです';
   static readonly USER_REGISTRATION_FAILED = 'ユーザー登録に失敗しました';
+  static readonly PROFILE_UPDATE_FAILED = 'プロフィールの更新に失敗しました';
+  static readonly PASSWORD_CHANGE_FAILED = 'パスワードの変更に失敗しました';
+  static readonly EMAIL_CHANGE_FAILED = 'メールアドレスの変更に失敗しました';
+  static readonly ACCOUNT_DEACTIVATION_FAILED = 'アカウントの無効化に失敗しました';
   static readonly LOGIN_FAILED = 'ログインに失敗しました';
   static readonly TOKEN_REFRESH_FAILED = 'トークンの更新に失敗しました';
 }
