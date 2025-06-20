@@ -92,20 +92,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         throw ResourceNotFoundException.user(payload.sub, 'JwtStrategy.validate');
       }
 
-      // 非アクティブユーザーチェック
-      if (!user.isActive) {
-        this.logger.warn('Inactive user attempted access', {
-          userId: user.id,
-          jti: payload.jti,
-        });
-        throw new BusinessLogicException(
-          AuthErrorMessages.ACCOUNT_INACTIVE,
-          'ACCOUNT_INACTIVE',
-          { userId: user.id },
-          'JwtStrategy.validate',
-        );
-      }
-
       this.logger.log('JWT validation successful', {
         userId: user.id,
         jti: payload.jti,
