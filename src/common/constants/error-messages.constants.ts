@@ -79,6 +79,8 @@ export class ValidationErrorMessages {
   // タグ関連
   static readonly TAG_NAME_REQUIRED = 'タグ名は必須です';
   static readonly TAG_NAME_TOO_LONG = `タグ名は${TagConstants.NAME_MAX_LENGTH}文字以内で入力してください`;
+  static readonly TAG_NAME_CONTAINS_ANGLE_BRACKETS = 'タグ名に < > 文字は使用できません';
+  static readonly TAG_NAME_WHITESPACE_ONLY = 'タグ名に空白文字のみは使用できません';
   static readonly TAG_COLOR_INVALID = '有効なカラーコード（#RRGGBB形式）を入力してください';
   static readonly TAG_DESCRIPTION_TOO_LONG = `タグ説明は${TagConstants.DESCRIPTION_MAX_LENGTH}文字以内で入力してください`;
   static readonly TAG_ID_REQUIRED = 'タグIDは必須です';

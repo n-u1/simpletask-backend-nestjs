@@ -4,7 +4,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, ManyToOn
 import { TaskTag } from '@/task-tags/entities/task-tag.entity';
 import type { Task } from '@/tasks/entities/task.entity';
 import { User } from '@/users/entities/user.entity';
-import { TagConstants, TaskStatus, validateColorCode } from '@common/constants/app.constants';
+import { TagConstants, validateColorCode } from '@common/constants/app.constants';
 import { ValidationErrorMessages } from '@common/constants/error-messages.constants';
 import { BaseEntity } from '@common/entities/base.entity';
 
@@ -161,27 +161,6 @@ export class Tag extends BaseEntity {
     return this.taskTags?.map(taskTag => taskTag.task).filter(Boolean) ?? [];
   }
 
-  get taskCount(): number {
-    return this.taskTags?.length ?? 0;
-  }
-
-  get activeTaskCount(): number {
-    return this.taskTags?.filter(taskTag => taskTag.task && taskTag.task.status !== TaskStatus.ARCHIVED).length ?? 0;
-  }
-
-  get completedTaskCount(): number {
-    return this.taskTags?.filter(taskTag => taskTag.task && taskTag.task.status === TaskStatus.DONE).length ?? 0;
-  }
-
-  get pendingTaskCount(): number {
-    return (
-      this.taskTags?.filter(
-        taskTag =>
-          taskTag.task && taskTag.task.status !== TaskStatus.DONE && taskTag.task.status !== TaskStatus.ARCHIVED,
-      ).length ?? 0
-    );
-  }
-
   get colorRgb(): [number, number, number] {
     const color = this.color.slice(1); // #を除去
     const r = parseInt(color.slice(0, 2), 16);
@@ -241,13 +220,6 @@ export class Tag extends BaseEntity {
     return this.isDarkColor ? '#FFFFFF' : '#000000';
   }
 
-  get usageRate(): number {
-    if (this.taskCount === 0) {
-      return 0;
-    }
-    return Math.round((this.completedTaskCount / this.taskCount) * 100);
-  }
-
   static getPresetColors(): readonly string[] {
     return TagConstants.PRESET_COLORS;
   }
@@ -264,16 +236,11 @@ export class Tag extends BaseEntity {
     const plainObject = super.toPlainObject();
 
     // 追加の計算プロパティを含める
-    plainObject.taskCount = this.taskCount;
-    plainObject.activeTaskCount = this.activeTaskCount;
-    plainObject.completedTaskCount = this.completedTaskCount;
-    plainObject.pendingTaskCount = this.pendingTaskCount;
     plainObject.colorRgb = this.colorRgb;
     plainObject.colorHsl = this.colorHsl;
     plainObject.isPresetColor = this.isPresetColor;
     plainObject.isDarkColor = this.isDarkColor;
     plainObject.contrastTextColor = this.contrastTextColor;
-    plainObject.usageRate = this.usageRate;
 
     return plainObject;
   }

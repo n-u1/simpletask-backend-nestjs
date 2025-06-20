@@ -30,7 +30,7 @@ export class TaskSuccessMessages {
   static readonly TASK_CREATED = 'タスクが作成されました';
   static readonly TASK_UPDATED = 'タスクが更新されました';
   static readonly TASK_DELETED = 'タスクが削除されました';
-  static readonly TASK_DETAIL_RETRIEVED = 'プロフィールを取得しました';
+  static readonly TASK_DETAIL_RETRIEVED = 'タスク詳細を取得しました';
   static readonly TASK_STATUS_UPDATED = 'タスクのステータスが更新されました';
   static readonly TASK_COMPLETED = 'タスクが完了しました';
   static readonly TASK_ARCHIVED = 'タスクがアーカイブされました';
@@ -47,6 +47,7 @@ export class TagSuccessMessages {
   static readonly TAG_CREATED = 'タグが作成されました';
   static readonly TAG_UPDATED = 'タグが更新されました';
   static readonly TAG_DELETED = 'タグが削除されました';
+  static readonly TAG_DETAIL_RETRIEVED = 'タグ詳細を取得しました';
   static readonly TAG_COLOR_UPDATED = 'タグの色が更新されました';
   static readonly TAG_ATTACHED = 'タグが追加されました';
   static readonly TAG_DETACHED = 'タグが削除されました';

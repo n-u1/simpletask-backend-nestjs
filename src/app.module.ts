@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '@/auth/auth.module';
+import { TagsModule } from '@/tags/tags.module';
 import { TasksModule } from '@/tasks/tasks.module';
 import { UsersModule } from '@/users/users.module';
 import { AllExceptionsFilter } from '@common/filters/all-exceptions.filter';
@@ -76,6 +77,7 @@ import { AppService } from './app.service';
     // 機能モジュール
     AuthModule,
     UsersModule,
+    TagsModule,
     TasksModule,
   ],
   controllers: [AppController],
