@@ -5,12 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
 import { Repository } from 'typeorm';
 
+import { JwtPayload } from '@/auth/strategies/jwt.strategy';
 import { User } from '@/users/entities/user.entity';
 import { AuthErrorMessages } from '@common/constants/error-messages.constants';
 import { BusinessLogicException } from '@common/exceptions/business-logic.exception';
 import { ResourceNotFoundException } from '@common/exceptions/resource-not-found.exception';
-
-import { JwtPayload } from '@/auth/strategies/jwt.strategy';
 
 /**
  * リフレッシュJWT認証戦略
