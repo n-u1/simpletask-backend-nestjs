@@ -6,17 +6,13 @@
 
 import { randomUUID } from 'crypto';
 
-import { config } from 'dotenv';
 import 'reflect-metadata';
-
-config({ path: '.env.test' });
 
 jest.setTimeout(30000);
 
 beforeAll((): void => {
   // テスト用データベース接続確認
   process.env.NODE_ENV = 'test';
-  process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/simpletask_test';
 });
 
 afterAll((): void => {

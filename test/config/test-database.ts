@@ -1,12 +1,9 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { config } from 'dotenv';
 import { DataSource, DataSourceOptions, LogLevel } from 'typeorm';
 
-config();
-
 const configService = new ConfigService();
-const logger = new Logger('DataSource');
+const logger = new Logger('TestDataSource');
 
 const isProduction = configService.get('NODE_ENV') === 'production';
 const isTest = configService.get('NODE_ENV') === 'test';
@@ -35,16 +32,16 @@ const getNumericConfig = (key: string, defaultValue: number): number => {
 
 const getEntityPaths = (): string[] => {
   if (isProduction) {
-    return ['dist/**/*.entity.js'];
+    return ['../../dist/**/*.entity.js'];
   }
-  return ['src/**/*.entity.ts'];
+  return ['../../src/**/*.entity.ts'];
 };
 
 const getMigrationPaths = (): string[] => {
   if (isProduction) {
-    return ['dist/database/migrations/*.js'];
+    return ['../../dist/database/migrations/*.js'];
   }
-  return ['database/migrations/*.ts'];
+  return ['../../database/migrations/*.ts'];
 };
 
 const getSSLConfig = (): boolean | Record<string, unknown> => {
@@ -86,7 +83,7 @@ const getCacheConfig = (): false | Record<string, unknown> => {
       host: configService.getOrThrow<string>('REDIS_HOST'),
       port: getNumericConfig('REDIS_PORT', 6379),
       password: configService.getOrThrow<string>('REDIS_PASSWORD'),
-      db: getNumericConfig('REDIS_DB', 1), // キャッシュ用は別DB
+      db: getNumericConfig('REDIS_DB', 1),
     },
     duration: 30000, // 30秒
   };
@@ -135,68 +132,96 @@ const getBaseConfig = (): Partial<DataSourceOptions> => ({
 
 const getPoolConfig = (): PoolConfig => ({
   // PostgreSQL pg ライブラリの接続プール設定
-  max: getNumericConfig('DB_POOL_SIZE', 5),
+  max: getNumericConfig('DB_POOL_SIZE', 3),
   min: 1,
-  idleTimeoutMillis: 30000,
+  idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 2000,
-  acquireTimeoutMillis: 60000,
-  createTimeoutMillis: 30000,
+  acquireTimeoutMillis: 10000,
+  createTimeoutMillis: 10000,
   // PostgreSQL固有設定
-  application_name: `simpletask-nestjs-${configService.get('NODE_ENV', 'development')}`,
-  statement_timeout: 30000, // 30秒
-  query_timeout: 30000, // 30秒
+  application_name: `simpletask-nestjs-test-${configService.get('NODE_ENV', 'test')}`,
+  statement_timeout: 10000,
+  query_timeout: 10000,
   keepAlive: true,
   keepAliveInitialDelayMillis: 0,
 });
 
-const AppDataSource = new DataSource({
+const TestDataSource = new DataSource({
   ...getBaseConfig(),
   extra: getPoolConfig(),
 } as DataSourceOptions);
 
-export const initializeDataSource = async (): Promise<void> => {
+export const initializeTestDataSource = async (): Promise<void> => {
   try {
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
+    if (!TestDataSource.isInitialized) {
+      await TestDataSource.initialize();
 
       // 接続テスト
-      await AppDataSource.query('SELECT 1');
+      await TestDataSource.query('SELECT 1');
 
-      logger.log(`Database connection established successfully (${configService.get('NODE_ENV')} mode)`);
+      logger.log(`Test database connection established successfully (${configService.get('NODE_ENV')} mode)`);
     }
   } catch (error) {
-    logger.error('Database connection failed:', error);
-    throw new Error(`Failed to connect to database: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    logger.error('Test database connection failed:', error);
+    throw new Error(`Failed to connect to test database: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
-export const checkDatabaseHealth = async (): Promise<boolean> => {
+export const checkTestDatabaseHealth = async (): Promise<boolean> => {
   try {
-    if (!AppDataSource.isInitialized) {
+    if (!TestDataSource.isInitialized) {
       return false;
     }
 
-    await AppDataSource.query('SELECT 1');
+    await TestDataSource.query('SELECT 1');
     return true;
   } catch (error) {
-    logger.error('Database health check failed:', error);
+    logger.error('Test database health check failed:', error);
     return false;
   }
 };
 
-export const destroyDataSource = async (): Promise<void> => {
+export const destroyTestDataSource = async (): Promise<void> => {
   try {
-    if (AppDataSource.isInitialized) {
+    if (TestDataSource.isInitialized) {
       // 進行中のクエリ完了を待つ
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500)); // テスト用に短縮
 
-      await AppDataSource.destroy();
-      logger.log('Database connection closed successfully');
+      await TestDataSource.destroy();
+      logger.log('Test database connection closed successfully');
     }
   } catch (error) {
-    logger.error('Error closing database connection:', error);
+    logger.error('Error closing test database connection:', error);
     throw error;
   }
 };
 
-export default AppDataSource;
+// テスト用のデータベースクリーンアップヘルパー
+export const cleanTestDatabase = async (): Promise<void> => {
+  if (!TestDataSource.isInitialized) {
+    await initializeTestDataSource();
+  }
+
+  try {
+    // 外部キー制約を一時的に無効化
+    await TestDataSource.query('SET session_replication_role = replica');
+
+    // 全テーブルのデータを削除（テーブル構造は保持）
+    const entities = TestDataSource.entityMetadatas;
+
+    for (const entity of entities) {
+      const repository = TestDataSource.getRepository(entity.target);
+      await repository.clear();
+    }
+
+    // 外部キー制約を再有効化
+    await TestDataSource.query('SET session_replication_role = DEFAULT');
+
+    logger.log('Test database cleaned successfully');
+  } catch (error) {
+    logger.error('Failed to clean test database:', error);
+    throw error;
+  }
+};
+
+export default TestDataSource;

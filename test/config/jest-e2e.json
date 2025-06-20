@@ -1,0 +1,31 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "../..",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@config/(.*)$": "<rootDir>/src/config/$1",
+    "^@common/(.*)$": "<rootDir>/src/common/$1"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/test/config/jest-setup.ts"],
+  "coverageDirectory": "<rootDir>/coverage/e2e",
+  "collectCoverageFrom": [
+    "<rootDir>/src/**/*.(t|j)s",
+    "!<rootDir>/src/**/*.spec.ts",
+    "!<rootDir>/src/**/*.e2e-spec.ts",
+    "!<rootDir>/src/**/*.interface.ts",
+    "!<rootDir>/src/**/*.dto.ts",
+    "!<rootDir>/src/main.ts"
+  ],
+  "globals": {
+    "ts-jest": {
+      "tsconfig": "<rootDir>/test/config/tsconfig.json"
+    }
+  },
+  "testTimeout": 60000,
+  "maxWorkers": 1
+}
