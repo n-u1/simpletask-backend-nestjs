@@ -30,6 +30,7 @@ export class TaskSuccessMessages {
   static readonly TASK_CREATED = 'タスクが作成されました';
   static readonly TASK_UPDATED = 'タスクが更新されました';
   static readonly TASK_DELETED = 'タスクが削除されました';
+  static readonly TASK_DETAIL_RETRIEVED = 'プロフィールを取得しました';
   static readonly TASK_STATUS_UPDATED = 'タスクのステータスが更新されました';
   static readonly TASK_COMPLETED = 'タスクが完了しました';
   static readonly TASK_ARCHIVED = 'タスクがアーカイブされました';

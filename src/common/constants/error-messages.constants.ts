@@ -70,6 +70,11 @@ export class ValidationErrorMessages {
   static readonly TASK_POSITION_INVALID = `位置は${TaskConstants.POSITION_MIN}以上${TaskConstants.POSITION_MAX}以下で入力してください`;
   static readonly TASK_DUE_DATE_INVALID = '有効な日時を入力してください';
   static readonly TASK_ID_REQUIRED = 'タスクIDは必須です';
+  static readonly TASK_COMPLETE_AND_ARCHIVE_CONFLICT = '完了とアーカイブを同時に設定することはできません';
+  static readonly TASK_COMPLETE_STATUS_MISMATCH =
+    '完了フラグが設定されている場合、ステータスはdoneである必要があります';
+  static readonly TASK_ARCHIVE_STATUS_MISMATCH =
+    'アーカイブフラグが設定されている場合、ステータスはarchivedである必要があります';
 
   // タグ関連
   static readonly TAG_NAME_REQUIRED = 'タグ名は必須です';
