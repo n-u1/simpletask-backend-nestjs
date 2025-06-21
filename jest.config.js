@@ -7,7 +7,12 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': [
+      'ts-jest',
+      {
+        tsconfig: 'test/config/tsconfig.json',
+      },
+    ],
   },
   collectCoverageFrom: [
     'src/**/*.(t|j)s',
@@ -27,12 +32,6 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/test/config/jest-setup.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/', '/coverage/'],
   testMatch: ['<rootDir>/src/**/*.spec.ts', '<rootDir>/test/**/*.spec.ts'],
-  globals: {
-    'ts-jest': {
-      tsconfig: 'test/config/tsconfig.json',
-      isolatedModules: true,
-    },
-  },
   passWithNoTests: true,
   testTimeout: 30000,
   maxWorkers: '50%',

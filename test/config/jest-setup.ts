@@ -1,12 +1,60 @@
-/* eslint-disable no-console, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return */
 /**
  * Jestテスト環境セットアップ
  * 全テストで共通的に使用される設定・モック・ヘルパー
  */
 
 import { randomUUID } from 'crypto';
-
 import 'reflect-metadata';
+
+// =============================================================================
+// グローバルモック設定
+// =============================================================================
+
+// NestJS Logger をモック化（テストログ非表示）
+jest.mock('@nestjs/common', () => {
+  const actual = jest.requireActual('@nestjs/common');
+  return {
+    ...actual,
+    Logger: class MockLogger {
+      static error = jest.fn();
+      static warn = jest.fn();
+      static log = jest.fn();
+      static debug = jest.fn();
+      static verbose = jest.fn();
+      static overrideLogger = jest.fn();
+      static getTimestamp = jest.fn(() => new Date().toISOString());
+
+      error = jest.fn();
+      warn = jest.fn();
+      log = jest.fn();
+      debug = jest.fn();
+      verbose = jest.fn();
+      setContext = jest.fn();
+
+      constructor() {
+        // Mock constructor
+      }
+    },
+  };
+});
+
+// Redis をモック化
+jest.mock('ioredis', () => {
+  return jest.fn().mockImplementation(() => ({
+    get: jest.fn(),
+    set: jest.fn(),
+    del: jest.fn(),
+    exists: jest.fn(),
+    expire: jest.fn(),
+    ping: jest.fn().mockResolvedValue('PONG'),
+    disconnect: jest.fn(),
+  }));
+});
+
+// =============================================================================
+// Jest 設定
+// =============================================================================
 
 jest.setTimeout(30000);
 
@@ -19,7 +67,14 @@ afterAll((): void => {
   // クリーンアップ処理
 });
 
-// コンソールの警告・エラーをフィルタリング
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+// =============================================================================
+// コンソール出力制御（開発時警告の抑制）
+// =============================================================================
+
 const originalConsoleWarn: typeof console.warn = console.warn;
 const originalConsoleError: typeof console.error = console.error;
 
@@ -49,18 +104,9 @@ console.error = (...args: unknown[]): void => {
   originalConsoleError(...args);
 };
 
-// グローバルモック設定
-jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => ({
-    get: jest.fn(),
-    set: jest.fn(),
-    del: jest.fn(),
-    exists: jest.fn(),
-    expire: jest.fn(),
-    ping: jest.fn().mockResolvedValue('PONG'),
-    disconnect: jest.fn(),
-  }));
-});
+// =============================================================================
+// テストユーティリティ
+// =============================================================================
 
 export const mockDate = (date: string | Date): jest.SpyInstance => {
   const targetDate = new Date(date);

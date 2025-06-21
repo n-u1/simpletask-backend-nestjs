@@ -5,6 +5,7 @@
     "strict": false,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
+    "isolatedModules": true,
     "types": ["jest", "node"],
     "allowJs": true
   },
