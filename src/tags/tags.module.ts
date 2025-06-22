@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TaskTag } from '@/task-tags/entities/task-tag.entity';
+import { Task } from '@/tasks/entities/task.entity';
 import { User } from '@/users/entities/user.entity';
 
 import { Tag } from './entities/tag.entity';
@@ -13,7 +14,7 @@ import { TagsService } from './tags.service';
  * タグ管理に関連する全ての機能を提供
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Tag, TaskTag, User])],
+  imports: [TypeOrmModule.forFeature([Tag, Task, TaskTag, User])],
   controllers: [TagsController],
   providers: [TagsService],
   exports: [TagsService, TypeOrmModule],

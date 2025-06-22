@@ -85,7 +85,13 @@ import { AppService } from './app.service';
     AppService,
     {
       provide: APP_PIPE,
-      useClass: CustomValidationPipe,
+      useFactory: (): CustomValidationPipe => {
+        return new CustomValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+        });
+      },
     },
     {
       provide: APP_FILTER,
